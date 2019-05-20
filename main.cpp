@@ -1,132 +1,80 @@
+
+
 #include<windows.h>
-#include <GL\glut.h>
-#include <math.h>      // For math routines (such as sqrt & trig).
-GLfloat xRotated, yRotated, zRotated;
-GLdouble radius=2;
-GLfloat qaBlack[] = {0.0, 0.0, 0.0, 1.0}; //Black Color
-GLfloat qaGreen[] = {0.0, 1.0, 0.0, 1.0}; //Green Color
-GLfloat qaWhite[] = {1.0, 1.0, 1.0, 1.0}; //White Color
-GLfloat qaRed[] = {1.0, 0.0, 0.0, 1.0}; //White Color
+#include <stdio.h>
+#include <GL/glut.h>
+#define PI 180
+#include<math.h>
 
-    // Set lighting intensity and color
-GLfloat qaAmbientLight[]    = {0.1, 0.1, 0.1, 1.0};
-GLfloat qaDiffuseLight[]    = {1, 1, 1, 1.0};
-GLfloat qaSpecularLight[]    = {1.0, 1.0, 1.0, 1.0};
-GLfloat emitLight[] = {0.9, 0.9, 0.9, 0.01};
-GLfloat Noemit[] = {0.0, 0.0, 0.0, 1.0};
-    // Light source position
-GLfloat qaLightPosition[]    = {0, 0, 0, 1};
 
-void display(void);
-void reshape(int x, int y);
 
-void idleFunc(void)
-{
-        if ( zRotated > 360.0 ) {
-         zRotated -= 360.0*floor(zRotated/360.0);   // Don't allow overflow
-      }
-
-          if ( yRotated > 360.0 ) {
-         yRotated -= 360.0*floor(yRotated/360.0);   // Don't allow overflow
-      }
-     zRotated += 0.01;
-     yRotated +=0.01;
-
-    display();
-}
-void initLighting()
+void expression(int x,int y,int r,int n,int l,int t)
 {
 
-    // Enable lighting
-    glEnable(GL_LIGHTING);
-    glEnable(GL_LIGHT0);
+    float m;
+    glBegin(GL_LINE_STRIP);
 
-     // Set lighting intensity and color
-       glLightfv(GL_LIGHT0, GL_AMBIENT, qaAmbientLight);
-    glLightfv(GL_LIGHT0, GL_DIFFUSE, qaDiffuseLight);
-    glLightfv(GL_LIGHT0, GL_SPECULAR, qaSpecularLight);
-
+     for( int angle = l; angle < t; angle ++ ){
+        m=angle*3.142/180;
+       glVertex2f( x+r*cos(m),y+n*sin(m));}
+ glEnd();
 
 }
-
-int main (int argc, char **argv)
-{
-    glutInit(&argc, argv);
-     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH );
-    glutInitWindowSize(750,750);
-    glutCreateWindow("Solid Sphere");
-    initLighting();
-
-    xRotated = yRotated = zRotated = 0.0;
-
-    glutIdleFunc(idleFunc);
-    glutDisplayFunc(display);
-    glutReshapeFunc(reshape);
-    glutMainLoop();
-    return 0;
-}
-
-void display(void)
+void display()
 {
 
-
-    glMatrixMode(GL_MODELVIEW);
-    // clear the drawing buffer.
     glClear(GL_COLOR_BUFFER_BIT);
-    // clear the identity matrix.
-    glLoadIdentity();
 
-    glTranslatef(0.0,0.0,-20.0);
+    glColor3f(0,0,0);
+  expression(280,300,23,50,0,360);
+glColor3f(0,0,0);
 
+   expression(330,300,23,50,0,360);
 
-      //
-   glPushMatrix();
+    expression(300,300,210,250,166,376);
 
+    expression(150,470,120,120,8,245);
 
-    glTranslatef(0.0,0.0,0);
-    // Set material properties
-       glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, qaGreen);
+     expression(450,470,120,120,-64,174);
+     glColor3f(1,0,0);
+     expression(300,489,30,5,-10,190);
+     glColor3f(0,1,0);
+     expression(300,180,55,35,0,360);
+      expression(300,190,130,80,180,360);
+      expression(170,170,30,20,50,130);
+         expression(430,170,30,20,50,130);
+         glColor3f(0,0,1);
+    expression(300,187,95,110,215,325);
 
-    glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, qaGreen);
+     expression(290,271,15,25,40,245);
+     expression(320,271,15,25,-58,140);
 
-    glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, qaWhite);
-
-    glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, 0.2);
-    glutSolidSphere(radius,25,25);
-
-     glPopMatrix();
-
-
-
-    glPushMatrix();
-
-
-    glRotatef(yRotated,0.0,1.0,0.0);
-    glTranslatef(5.0,0.0,0.0);
-
-    // Set the light position
-     glLightfv(GL_LIGHT0, GL_POSITION, qaLightPosition);
-     glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, emitLight);   // Make sphere glow (emissive)
-     glutSolidSphere(radius/6,25,25);
-     glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, Noemit);
-
-    glPopMatrix();
+     expression(237,290,90,150,45,200);
+    expression(365,290,91,150,-21,137);
+     expression(482,240,31,45,36,185);
+    glColor3f(1,0,1);
+        expression(120,240,31,45,10,155);
 
 
-
-
-    glFlush();
-    glutSwapBuffers();
-
+glFlush();
 }
 
-void reshape(int x, int y)
+void init(void)
 {
-    if (y == 0 || x == 0) return;
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
+	glClearColor(1,1,1,1);
+	gluOrtho2D(0,600,0,600);
+   glMatrixMode(GL_MODELVIEW);
+   glMatrixMode(GL_PROJECTION);
+   glLoadIdentity();
 
-    gluPerspective(39.0,(GLdouble)x/(GLdouble)y,0.6,40.0);
-    glMatrixMode(GL_MODELVIEW);
-    glViewport(0,0,x,y);  //Use the whole window for rendering
 }
+int main()
+{
+    glutInitDisplayMode(GLUT_SINGLE|GLUT_RGB);
+	glutInitWindowSize(600,600);
+	glutCreateWindow("gasket");
+	init();
+	glutDisplayFunc(display);
+	glutMainLoop();
+}
+
