@@ -1,85 +1,107 @@
-#include<windows.h>
-#include<stdlib.h>
+
+#include <windows.h>
 #include<stdio.h>
-#include<gl/glut.h>
-int m;
-float v[][3]={{0,0,1},{0,1,0},{-1,-0.5,0},{1,-0.5,0}};
+#include<GL/glut.h>
+float x=0.0;
+float eye[3]={0,0,5};
+
+float p[8][3]={{-1,-1,-1},{-1,1,-1},{1,-1,-1},{1,1,-1},{-1,-1,1},{-1,1,1},{1,-1,1},{1,1,1}};
+
+float cl[8][3]={{-1,-1,-1},{-1,1,-1},{1,-1,-1},{1,1,-1},{-1,-1,1},{-1,1,1},{1,-1,1},{1,1,1}};
 void init()
 {
-
-    glClearColor(0,0,0,0);
-    glOrtho(-1,1,-1,1,-1,1);
-    glEnable(GL_DEPTH_TEST);
+	glClearColor(1,1,1,1);
+	glOrtho(-5,5,-5,5,-5,5);
+	glEnable(GL_DEPTH_TEST);
 }
 
-void drawtetra(float *a,float *b,float *c)
+void myReshape(int w,int h)
 {
-
-    glBegin(GL_TRIANGLES);
-    glVertex3fv(a);
-    glVertex3fv(b);
-    glVertex3fv(c);
-    glEnd();
-    glFlush();
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	if(w<=h)
+		glFrustum(-2,2,-2*h/w,2*h/w,4,20);
+	else
+		glFrustum(-2*w/h,2*w/h,-2,2,4,20);
+	glMatrixMode(GL_MODELVIEW);
+	glViewport(0,0,w,h);
 }
 
-void tetra(float *p,float *q,float *r ,float *s)
+
+void square(int a,int b,int c,int d)
 {
-
-    glColor3f(1,0,0);
-    drawtetra(p,q,s);
-     glColor3f(0,1,0);
-    drawtetra(p,s,r);
-     glColor3f(0,0,1);
-    drawtetra(q,s,r);
-     glColor3f(0,1,1);
-    drawtetra(p,q,r);
-
+	glBegin(GL_QUADS);
+	glColor3fv(cl[a]);
+	glVertex3fv(p[a]);
+	glColor3fv(cl[b]);
+	glVertex3fv(p[b]);
+	glColor3fv(cl[c]);
+	glVertex3fv(p[c]);
+	glColor3fv(cl[d]);
+	glVertex3fv(p[d]);
+	glEnd();
 }
 
-void divide(float *x,float *y,float *z,float *h,int m)
+void cube()
 {
+	square(0,1,3,2);
+	square(4,5,7,6);
+	square(6,7,3,2);
 
-    float p[6][6];
-    if(m>0)
-    {
+	square(4,5,1,0);
+	square(0,2,6,4);
+    square(5,1,3,7);
+}
+/*void spin(void)
+{
+	if(x<360)
+	{
+		x=x+0.1;
+	}
+	else
+		x=0.0;
+	glutPostRedisplay();
+}*/
 
-        for(int i=0;i<3;i++)
-        {
-
-            p[0][i]=(x[i]+z[i])/2;
-             p[1][i]=(y[i]+z[i])/2;
-              p[2][i]=(x[i]+y[i])/2;
-               p[3][i]=(x[i]+h[i])/2;
-                p[4][i]=(y[i]+h[i])/2;
-                 p[5][i]=(z[i]+h[i])/2;
-        }
-        divide(x,p[0],p[2],p[3],m-1);
-          divide(p[0],z,p[1],p[5],m-1);
-            divide(p[2],p[1],y,p[4],m-1);
-              divide(p[3],p[5],p[4],h,m-1);
-
-
-    }
-    else{
-        tetra(x,y,z,h);
-    }
+void mykey(unsigned char key,int x,int y)
+{
+	if(key=='X')
+	  eye[0]=eye[0]+0.1;
+	if(key=='x')
+		eye[0]=eye[0]-0.1;
+	if(key=='Y')
+		eye[1]=eye[1]+0.1;
+	if(key=='y')
+		eye[1]=eye[1]-0.1;
+	if(key=='Z')
+		eye[2]=eye[2]+0.1;
+	if(key=='z')
+		eye[2]=eye[2]-0.1;
+	glutPostRedisplay();
 }
 void display()
 {
-
-    glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-    divide(v[0],v[1],v[2],v[3],m);
+	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+	glLoadIdentity();
+	gluLookAt(eye[0],eye[1],eye[2],0,0,0,0,1,0);
+	cube();
+	glFlush();
 }
+
 int main()
 {
 
-    glutInitWindowSize(600,600);
-    glutInitDisplayMode(GLUT_SINGLE);
-    glutCreateWindow("gdfghd");
-    init();
-    printf("division\n");
-    scanf("%d",&m);
-    glutDisplayFunc(display);
-    glutMainLoop();
+	glutInitDisplayMode(GLUT_SINGLE|GLUT_DEPTH);
+	glutInitWindowSize(500,500);
+
+	glutInitWindowPosition(0,0);
+	glutCreateWindow("cube");
+	init();
+	glutReshapeFunc(myReshape);
+	//glutIdleFunc(spin);
+	glutKeyboardFunc(mykey);
+	glutDisplayFunc(display);
+
+	glutMainLoop();
+	return 0;
 }
